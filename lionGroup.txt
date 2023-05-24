@@ -1,0 +1,9 @@
+Group:tail
+vertex(9, -118);
+vertex(-8, -61);
+vertex(78, -79);
+vertex(105, -38);
+vertex(152, -36);
+vertex(184, -41);
+vertex(185, -15);
+EndGroup

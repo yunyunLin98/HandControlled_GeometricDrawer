@@ -1,0 +1,177 @@
+beginShape(TRIANGLE_STRIP);
+vertex(-444, -153);
+vertex(-427, -130);
+vertex(-401, -137);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-408, -167);
+vertex(-386, -226);
+vertex(-401, -137);
+vertex(-354, -197);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-386, -226);
+vertex(-354, -197);
+vertex(-342, -237);
+vertex(-258, -171);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-354, -197);
+vertex(-258, -171);
+vertex(-273, -85);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-354, -197);
+vertex(-273, -85);
+vertex(-344, -48);
+vertex(-401, -137);
+vertex(-405, -105);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-344, -48);
+vertex(-379, -51);
+vertex(-376, -80);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-344, -48);
+vertex(-273, -85);
+vertex(-265, -3);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-344, -48);
+vertex(-265, -3);
+vertex(-286, 49);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-344, -48);
+vertex(-286, 49);
+vertex(-333, 81);
+vertex(-291, 111);
+vertex(-352, 92);
+vertex(-362, 118);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-258, -171);
+vertex(-273, -85);
+vertex(-194, -123);
+vertex(-117, -109);
+vertex(-171, 1);
+vertex(-273, -85);
+vertex(-265, -4);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-171, 1);
+vertex(-230, 0);
+vertex(-182, 41);
+vertex(-204, 68);
+vertex(-184, 97);
+vertex(-230, 76);
+vertex(-239, 102);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-117, -109);
+vertex(-171, 1);
+vertex(-71, -10);
+vertex(-8, -61);
+vertex(-117, -109);
+vertex(9, -118);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-8, -61);
+vertex(9, -118);
+vertex(78, -79);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-8, -61);
+vertex(78, -79);
+vertex(105, -38);
+vertex(152, -36);
+vertex(185, -15);
+vertex(184, -41);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-71, -10);
+vertex(-34, 22);
+vertex(-8, -61);
+vertex(28, 1);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-34, 22);
+vertex(28, 1);
+vertex(34, 55);
+vertex(57, 54);
+vertex(66, 95);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(34, 55);
+vertex(66, 95);
+vertex(33, 82);
+vertex(6, 85);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(6, 85);
+vertex(66, 95);
+vertex(0, 101);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-71, -10);
+vertex(-34, 22);
+vertex(-100, -5);
+vertex(-71, 36);
+vertex(-16, 62);
+vertex(2, 41);
+vertex(-18, 101);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-16, 62);
+vertex(-18, 101);
+vertex(-35, 84);
+vertex(-60, 101);
+endShape();
+
+
+beginShape(TRIANGLE_STRIP);
+vertex(-408, -167);
+vertex(-444, -153);
+vertex(-401, -137);
+endShape();
+
+
