@@ -8,7 +8,6 @@ let kpCircleDiameter = 10;
 let kpColor;
 let skeletonColor;
 
-let startPinchingTime = 0;
 
 
 function setupHandRecognition() {
@@ -37,7 +36,6 @@ function onHandPoseModelReady() {
 function onNewHandPosePrediction(predictions) {
   if (predictions && predictions.length > 0) {
     curHandPose = predictions[0];
-    // console.log(curHandPose);
   } else {
     curHandPose = null;
   }
@@ -54,18 +52,21 @@ function drawHand(handPose) {
   // While each keypoints supplies a 3D point (x,y,z), we only draw
   // the x, y point.
   push();
-  console.log("here");
   fill(kpColor);
     noStroke();
-    circle(width - handPose.landmarks[4][0],handPose.landmarks[4][1], kpCircleDiameter);
-    circle(width - handPose.landmarks[8][0],handPose.landmarks[8][1], kpCircleDiameter);
+    circle(width - handPose.landmarks[4][0],handPose.landmarks[4][1], kpCircleDiameter); // thumb tip
+    circle(width - handPose.landmarks[8][0],handPose.landmarks[8][1], kpCircleDiameter); // index finger tip
   pop();
 
 }
+
 let pointX = 0;
 let pointY = 0;
-let thresholdForPinchingGesture = 60;
+const pinchDistanceThreshold = 20;
+const checkPinchingTimeThreshold = 1000; // 1 sec
 let isPinching = false;
+let checkPinchingStartTime = 0;
+
 function checkPinchingPoint(handPose) {
   if (!handPose) {
     return false;
@@ -73,30 +74,59 @@ function checkPinchingPoint(handPose) {
 
   const distance = dist(handPose.landmarks[8][0], handPose.landmarks[8][1], handPose.landmarks[4][0], handPose.landmarks[4][1]);
   // console.log(distance);
-  
-  if (distance <= thresholdForPinchingGesture) {
-    pointX = width - (handPose.landmarks[8][0] + handPose.landmarks[4][0]) / 2 ;
-    pointY = (handPose.landmarks[8][1] + handPose.landmarks[4][1]) / 2;
-push();
-  // scale(-1,1);
-    midColor = color('red');
-    fill(midColor);
-    noStroke();
-    circle(pointX , pointY, kpCircleDiameter);
-    pop();
-    if(!isPinching){
-      startPinchingTime = millis();
-      isPinching = true;
-      console.log("start:" + startPinchingTime);
+  // set the middle point of thumb and index finger tip
+  pointX = width - (handPose.landmarks[8][0] + handPose.landmarks[4][0]) / 2 ;
+  pointY = (handPose.landmarks[8][1] + handPose.landmarks[4][1]) / 2;
+
+  if (distance <= pinchDistanceThreshold) { // within pinch threshold
+ 
+    if(!isPinching){ // check pinch time
+      if(checkPinchingStartTime == 0){ // start counting for pinch time
+        checkPinchingStartTime = millis();
+        console.log("start check:" + checkPinchingStartTime);
+        return false;
+      }
+      else{ // already counting
+
+        // done check -> red
+        if(millis() - checkPinchingStartTime > checkPinchingTimeThreshold){
+          isPinching = true;
+          console.log("isPinching");
+          push();
+            midColor = color('yellow');
+            fill(midColor);
+            noStroke();
+            circle(pointX , pointY, kpCircleDiameter);
+          pop();
+          return true;
+        }
+        // checking -> yellow
+        push();
+          midColor = color('yellow');
+          fill(midColor);
+          noStroke();
+          circle(pointX , pointY, kpCircleDiameter);
+        pop();
+      }
     }
-    return true;
   }
-  if(isPinching){
-    isPinching = false;
-    startPinchingTime = 0;
-    console.log("end:" + millis());
+  else { // out of pinch threshold -> blue
+    
+    push();
+      midColor = color('blue');
+      fill(midColor);
+      noStroke();
+      circle(pointX , pointY, kpCircleDiameter);
+    pop();
+
+    if(isPinching){// break pinching
+      isPinching = false;
+      checkPinchingStartTime = 0;
+      console.log("end check:" + millis());
+    }
+    return false;
   }
-  return false;
+  
 }
 
 

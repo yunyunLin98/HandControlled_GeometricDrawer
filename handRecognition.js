@@ -190,7 +190,7 @@ function checkPinchingPoint(handPose) {
   const distance = dist(handPose.landmarks[8][0], handPose.landmarks[8][1], handPose.landmarks[4][0], handPose.landmarks[4][1]);
   // console.log(distance);
   
-  if (distance <= thresholdForPinchingGesture) {
+  if (distance <= pinchDistanceThreshold) {
     pointX = width - (handPose.landmarks[8][0] + handPose.landmarks[4][0]) / 2 ;
     pointY = (handPose.landmarks[8][1] + handPose.landmarks[4][1]) / 2;
 push();
@@ -201,15 +201,15 @@ push();
     circle(pointX , pointY, kpCircleDiameter);
     pop();
     if(!isPinching){
-      startPinchingTime = millis();
+      checkPinchingStartTime = millis();
       isPinching = true;
-      console.log("start:" + startPinchingTime);
+      console.log("start:" + checkPinchingStartTime);
     }
     return true;
   }
   if(isPinching){
     isPinching = false;
-    startPinchingTime = 0;
+    checkPinchingStartTime = 0;
     console.log("end:" + millis());
   }
   return false;

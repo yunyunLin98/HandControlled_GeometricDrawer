@@ -2,8 +2,6 @@
 let canvasWidth = 640;
 let canvasHeight = 480;
 let sizeFactor = 1;
-const ImgFile = "lionImg.txt";
-const GroupFile = "lionGroup.txt";
 //Text
 const font = "Helvetica";
 const textString = "Click to add vertex\nHold ALT to drag vertex\nPress BACKSPACE to delete vertex\nPress ESC to close shape\nHold SHIFT to select multiple vertices, and release to group(esc to cancel)\nHolde G to view vertices of same graph with highlighted vertex\nPress ENTER to print all vertices (relative to the origin) to the console\nPress DEL to clear canvas";
@@ -29,11 +27,9 @@ let ImgStrings, GroupStrings;
 let grouping = false;
 let groupingVectors = [];
 let groups = [];
-const pinchConfirmTime = 2000;
 
 function preload() {
-  ImgStrings = loadStrings(ImgFile);
-  GroupStrings = loadStrings(GroupFile);
+
 }
 
 function setup() {
@@ -42,28 +38,11 @@ function setup() {
   origin = new Vector(canvasWidth / 2, canvasHeight / 2);
   textFont(font);
   textSize(18);
-  // LoadVectors();
-  // LoadGroups();
-  
-  video = createCapture(VIDEO);
-  video.size(width, height);
 
-  handPoseModel = ml5.handpose(video, onHandPoseModelReady);
-
-  // Call onNewHandPosePrediction every time a new handPose is predicted
-  handPoseModel.on("predict", onNewHandPosePrediction);
-
-  // Hide the video element, and just show the canvas
-  video.hide();
-
-  boundingBoxColor = color(255, 0, 0);
-  kpColor = color(0, 255, 0, 200);
-  skeletonColor = color(kpColor);
-
+  setupHandRecognition();
 }
 
 function draw() {
-  // background(0);
   push();
   scale(-1,1);
   image(video, -width, 0, width, height);
@@ -83,21 +62,29 @@ function draw() {
   text(textString, 10, 30);
   pop();
   
+  // Hand
+  drawHand(curHandPose);
+  checkPinchingPoint(curHandPose)
+  confirmPinchPoint();
+
+
   //Behaviour
   drag = keyIsDown(ALT);
   grouping = grouping || keyIsDown(SHIFT);
   space = keyIsDown(71); //G
 
   nearest = findNearest(vector, new Vector(pointX, pointY), colliderRadius);
-  // nearest = findNearest(vector, new Vector(mouseX, mouseY), colliderRadius);
   
   // Draw triangle strip
-  if (graph.length == 0 && vector.length == 0) {
+  // console.log("A");
+  if (graph.length == 0 && vector.length == 0) { // no points
     return;
   }
-  if (graph.length == 0 && vector.length < 2) {
+  // console.log("B");
+  if (graph.length == 0 && vector.length < 2) { // only one point
     point(vector[0].x, vector[0].y);
-  } else {
+  } 
+  else { // draw strip
     graph.forEach(function (g) {
       beginShape(TRIANGLE_STRIP);
       g.vectors.forEach((v) => vertex(v.x, v.y));
@@ -108,11 +95,12 @@ function draw() {
     vector.forEach((v) => vertex(v.x, v.y));
     {
       stroke(100);
-      vertex(mouseX, mouseY);
+      vertex(pointX, pointY);
       stroke(255);
     }
     endShape();
   }
+  // console.log("C");
   // Draw nearest vertex collider
   if (nearest != undefined) {
     stroke(0, 255, 255);
@@ -136,18 +124,6 @@ function draw() {
       stroke(255);
     });
   }
-  if(curHandPose){
-    drawHand(curHandPose);
-    checkPinchingPoint(curHandPose);
-    if(millis() - startPinchingTime > pinchConfirmTime){
-      confirmPinch();
-    }
-    
-  stroke(255, 0, 255);
-      circle(pinchedPoint.x, pinchedPoint.y, colliderRadius - 5);
-      stroke(255);
-
-  }
 }
 
 function findNearest(vertices, pos, radius) {
@@ -168,47 +144,58 @@ function findNearest(vertices, pos, radius) {
 
   return nearest;
 }
-function mousePressed() {
-  // if(mouseX >= textRect.x && mouseX <= textRect.x + textRect.w){
-  //   if(mouseY >= textRect.y && mouseY <= textRect.y + textRect.h){
-  //     return;
-  //   }
-  // }
-  if (drag) return;
-  if (nearest == undefined && !grouping) {
-    vector.push(new Vector(mouseX, mouseY));
-    esc = false;
-  } else if (nearest != undefined) {
-    if (grouping) {
-      groupingVectors.push(nearest);
-    } else {
-      vector.push(nearest);
-    }
-  }
-}
-let pinchConfirmed = false;
+
 let pinchedPoint;
-function confirmPinch(){
-  // if (drag) return;
-  if (nearest == undefined && !grouping && !pinchConfirmed) {
-    pinchedPoint = new Vector(pointX, pointY);
-    vector.push(pinchedPoint);
-    pinchConfirmed = true;
-    esc = false;
-  } else if (nearest != undefined) {
-    if (grouping) {
-      groupingVectors.push(nearest);
-    } else {
-      vector.push(nearest);
+let confirmPinchingStartTime = 0;
+const confirmPinchPointTimeThreshold = 2000; // 2 sec
+
+function confirmPinchPoint(){
+  if(isPinching){ // not confirmed
+    if(pinchedPoint == undefined){
+      if(confirmPinchingStartTime == 0){ // start counting for confirm pinch point
+        confirmPinchingStartTime = millis();
+        console.log("start confirm:" + confirmPinchingStartTime);
+      }
+      else{ // already counting
+        
+        if(millis() - confirmPinchingStartTime > confirmPinchPointTimeThreshold){
+          
+          console.log("Confirm Pinched point");
+          // if (drag) return;
+          if (nearest == undefined && !grouping) { // create new point
+            console.log("create new point");
+            pinchedPoint = new Vector(pointX, pointY);
+            vector.push(pinchedPoint);
+            esc = false;
+          } 
+          else if (nearest != undefined) {
+            
+            if (grouping) {
+              groupingVectors.push(nearest);
+            } 
+            else {
+              vector.push(nearest);
+            }
+            console.log("select: "+nearest);
+          }
+        }
+      }
     }
-    console.log("select: "+nearest);
   }
+  else{
+    if(pinchedPoint != undefined){ // was pinching point
+      pinchedPoint = undefined;
+      confirmPinchingStartTime = 0;
+      console.log("end Point");
+    }
+  }
+ 
 }
 
-function mouseDragged() {
+function dragPinch() {
   if (nearest != undefined && drag) {
-    nearest.x = mouseX;
-    nearest.y = mouseY;
+    nearest.x = pointX;
+    nearest.y = pointY;
   }
 }
 
