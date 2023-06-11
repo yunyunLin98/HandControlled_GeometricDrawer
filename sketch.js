@@ -147,7 +147,10 @@ function findNearest(vertices, pos, radius) {
 
 let pinchedPoint;
 let confirmPinchingStartTime = 0;
-const confirmPinchPointTimeThreshold = 2000; // 2 sec
+const confirmPinchPointTimeThreshold = 1000; // 2 sec
+let lastAddedPoint;
+let lastAddPointTime = 0;
+const minAddPointTimeCD = 2500;
 
 function confirmPinchPoint(){
   if(isPinching){ // not confirmed
@@ -161,12 +164,20 @@ function confirmPinchPoint(){
         if(millis() - confirmPinchingStartTime > confirmPinchPointTimeThreshold){
           
           console.log("Confirm Pinched point");
-          // if (drag) return;
+          if (drag) {
+            dragPinch();
+            return;
+          }
           if (nearest == undefined && !grouping) { // create new point
             console.log("create new point");
             pinchedPoint = new Vector(pointX, pointY);
+            if((millis() - lastAddPointTime < minAddPointTimeCD)&&(lastAddedPoint == pinchedPoint)){
+              return;
+            }
             vector.push(pinchedPoint);
             esc = false;
+            lastAddPointTime = millis();
+            lastAddedPoint = pinchedPoint;
           } 
           else if (nearest != undefined) {
             
@@ -179,6 +190,12 @@ function confirmPinchPoint(){
             console.log("select: "+nearest);
           }
         }
+        push();
+            midColor = color('red');
+            fill(midColor);
+            noStroke();
+            circle(pointX , pointY, kpCircleDiameter);
+        pop();
       }
     }
   }
@@ -187,6 +204,8 @@ function confirmPinchPoint(){
       pinchedPoint = undefined;
       confirmPinchingStartTime = 0;
       console.log("end Point");
+      lastAddPointTime = 0;
+      lastAddedPoint = undefined;
     }
   }
  
@@ -201,15 +220,15 @@ function dragPinch() {
 
 function keyPressed() {
   switch (keyCode) {
-    case 192: //`
+    case CONTROL:
       if (esc && nearest != undefined && nearest_Graph != undefined) {
         console.log(`delete ${nearest.x}, ${nearest.y}`);
         var idx = nearest_Graph.vectors.findIndex(e => e == nearest);
-        if(idx != -1) nearest_Graph.vectors.splice(idx, 1);
-        if (nearest_Graph.vectors.length == 0) {
-          idx = graph.findIndex((e) => e == nearest_Graph);
-          if(idx != -1) graph.splice(idx,1);
+        while(idx != -1){
+          nearest_Graph.vectors.splice(idx, 1);
+          idx = nearest_Graph.vectors.findIndex(e => e == nearest);
         }
+        
       }
       break;
     case BACKSPACE:
@@ -222,13 +241,6 @@ function keyPressed() {
         outputString.push(value.str + "\n");
         console.log(value.str + "\n");
       });
-      saveStrings(outputString, "output.txt");
-      var str = [];
-      groups.forEach(function (value) {
-        str.push(value.str + "\n");
-      });
-      saveStrings(str, "groups.txt");
-
       break;
     case ESCAPE:
       esc = true;

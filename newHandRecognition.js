@@ -62,7 +62,7 @@ function drawHand(handPose) {
 
 let pointX = 0;
 let pointY = 0;
-const pinchDistanceThreshold = 20;
+const pinchDistanceThreshold = 40;
 const checkPinchingTimeThreshold = 1000; // 1 sec
 let isPinching = false;
 let checkPinchingStartTime = 0;
@@ -92,12 +92,6 @@ function checkPinchingPoint(handPose) {
         if(millis() - checkPinchingStartTime > checkPinchingTimeThreshold){
           isPinching = true;
           console.log("isPinching");
-          push();
-            midColor = color('yellow');
-            fill(midColor);
-            noStroke();
-            circle(pointX , pointY, kpCircleDiameter);
-          pop();
           return true;
         }
         // checking -> yellow
@@ -107,6 +101,7 @@ function checkPinchingPoint(handPose) {
           noStroke();
           circle(pointX , pointY, kpCircleDiameter);
         pop();
+        console.log("checking");
       }
     }
   }
@@ -118,12 +113,9 @@ function checkPinchingPoint(handPose) {
       noStroke();
       circle(pointX , pointY, kpCircleDiameter);
     pop();
-
-    if(isPinching){// break pinching
-      isPinching = false;
-      checkPinchingStartTime = 0;
-      console.log("end check:" + millis());
-    }
+    isPinching = false;
+    checkPinchingStartTime = 0;
+    console.log("end pinch:");
     return false;
   }
   
